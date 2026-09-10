@@ -13,6 +13,13 @@
 //! independente em `lib/protocol.dart` no app Flutter — qualquer mudança
 //! aqui precisa ser replicada lá. Veja `docs/protocol.md` para a
 //! especificação completa.
+//!
+//! Este módulo implementa a superfície simétrica completa do protocolo
+//! (construtores e parsers para os 6 tipos de pacote). Como o
+//! `windows-server` só desempenha o papel de receptor, parte dela (ex.:
+//! construir `META`/`CHUNK`, parsear `ACK`/`NACK`/`DONE`) só é exercida
+//! pelo lado Android e pelos testes deste módulo — daí o `allow(dead_code)`.
+#![allow(dead_code)]
 
 use std::fmt;
 
