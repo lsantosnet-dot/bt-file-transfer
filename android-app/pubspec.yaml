@@ -13,7 +13,11 @@ dependencies:
     sdk: flutter
 
   # Bluetooth Classic (RFCOMM/SPP) — não há suporte a Wi-Fi/cabo neste app.
-  flutter_bluetooth_serial: ^0.4.0
+  # Fork mantido do flutter_bluetooth_serial (mesma API), necessário porque
+  # o pacote original parou em 2021 e não compila com AGP 8: usa jcenter(),
+  # não declara "namespace", fixa compileSdk 30 e ainda põe "package" no
+  # AndroidManifest. Veja o README para o histórico.
+  flutter_bluetooth_serial_plus: ^0.5.6
 
   # SHA-256 do arquivo antes do envio, usado no pacote META e na
   # verificação de integridade feita pelo servidor.

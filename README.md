@@ -22,9 +22,10 @@ bt-file-transfer/
   `Networking.Sockets`, `Storage.Streams`) para publicar um serviço
   RFCOMM, receber o arquivo em chunks de 4KB e verificar sua integridade
   via SHA-256.
-- **`android-app/`** — app Flutter que usa `flutter_bluetooth_serial`
-  para conectar a um dispositivo pareado e enviar um arquivo escolhido
-  pelo usuário, com barra de progresso.
+- **`android-app/`** — app Flutter que usa `flutter_bluetooth_serial_plus`
+  (fork mantido do `flutter_bluetooth_serial`, mesma API) para conectar a
+  um dispositivo pareado e enviar um arquivo escolhido pelo usuário, com
+  barra de progresso.
 - **`docs/protocol.md`** — especificação completa do protocolo binário
   de pacotes compartilhado pelos dois apps (formato do frame, os 6 tipos
   de pacote, payloads de `META`/`CHUNK`, diagrama de sequência e o UUID
