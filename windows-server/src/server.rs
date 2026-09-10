@@ -36,6 +36,11 @@ pub const SERVICE_UUID: &str = "00001101-0000-1000-8000-00805F9B34FB";
 /// Nome amigável anunciado no SDP record do serviço.
 const SERVICE_DISPLAY_NAME: &str = "BT File Transfer";
 
+/// Id do atributo SDP "ServiceName" e seu tipo (TextString), conforme a
+/// especificação Bluetooth.
+const SDP_SERVICE_NAME_ATTRIBUTE_ID: u32 = 0x0100;
+const SDP_SERVICE_NAME_TYPE: u8 = 0x25;
+
 /// Pasta padrão onde os arquivos recebidos são salvos.
 fn default_download_dir() -> PathBuf {
     PathBuf::from(r"C:\BtFileTransfer\recebidos")
@@ -92,6 +97,18 @@ pub fn run() -> windows::core::Result<()> {
             SocketProtectionLevel::BluetoothEncryptionAllowNullAuthentication,
         )?
         .get()?;
+
+    // Preenche o registro SDP com o nome do serviço antes de anunciar.
+    // Sem nenhum atributo o registro fica "pelado", e parte dos stacks
+    // Bluetooth ignora ou trata mal um SPP sem ServiceName. É o mesmo
+    // atributo que o exemplo RfcommChatServer da Microsoft escreve.
+    let sdp_writer = DataWriter::new()?;
+    sdp_writer.WriteByte(SDP_SERVICE_NAME_TYPE)?;
+    sdp_writer.WriteByte(SERVICE_DISPLAY_NAME.len() as u8)?;
+    sdp_writer.WriteString(&HSTRING::from(SERVICE_DISPLAY_NAME))?;
+    provider
+        .SdpRawAttributes()?
+        .Insert(SDP_SERVICE_NAME_ATTRIBUTE_ID, &sdp_writer.DetachBuffer()?)?;
 
     provider.StartAdvertising(&listener)?;
 
@@ -273,10 +290,3 @@ fn send_packet(writer: &DataWriter, packet: &Packet) -> Result<(), ServerError> 
     Ok(())
 }
 
-/// Mantido apenas para referência: o nome de exibição também pode ser
-/// usado para montar um `HSTRING` ao registrar atributos SDP
-/// adicionais, caso seja necessário customizar o SDP record no futuro.
-#[allow(dead_code)]
-fn display_name_hstring() -> HSTRING {
-    HSTRING::from(SERVICE_DISPLAY_NAME)
-}
