@@ -1,0 +1,36 @@
+name: android_app
+description: >
+  Cliente Android (Flutter) do bt-file-transfer: envia arquivos para o
+  servidor Windows via Bluetooth Classic (RFCOMM/SPP).
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Bluetooth Classic (RFCOMM/SPP) — não há suporte a Wi-Fi/cabo neste app.
+  flutter_bluetooth_serial: ^0.4.0
+
+  # SHA-256 do arquivo antes do envio, usado no pacote META e na
+  # verificação de integridade feita pelo servidor.
+  crypto: ^3.0.3
+
+  # Seleção do arquivo a ser enviado.
+  file_picker: ^8.0.0+1
+
+  # Permissões runtime BLUETOOTH_CONNECT / BLUETOOTH_SCAN (Android 12+).
+  permission_handler: ^11.3.1
+
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true

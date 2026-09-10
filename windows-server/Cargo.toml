@@ -1,0 +1,36 @@
+[package]
+name = "windows-server"
+version = "0.1.0"
+edition = "2021"
+description = "Servidor RFCOMM (Bluetooth Classic/SPP) para recebimento de arquivos enviados pelo app Android bt-file-transfer."
+license = "MIT"
+
+[[bin]]
+name = "bt-file-transfer-server"
+path = "src/main.rs"
+
+[dependencies]
+# SHA-256 usado para conferir a integridade do arquivo montado (parte
+# 2, requisito 5). Puro Rust, compila em qualquer plataforma.
+sha2 = "0.10"
+
+# A crate `windows` (bindings oficiais WinRT) só é necessária -- e só
+# compila de forma confiável -- em Windows, já que faz link direto com
+# DLLs do sistema operacional. Declarando-a como dependência
+# específica de `cfg(windows)`, o crate continua compilando (e os
+# testes do módulo `protocol` continuam rodando) em qualquer SO.
+[target.'cfg(windows)'.dependencies.windows]
+version = "0.58"
+features = [
+    "Devices_Bluetooth",
+    "Devices_Bluetooth_Rfcomm",
+    "Devices_Enumeration",
+    "Foundation",
+    "Foundation_Collections",
+    "Networking",
+    "Networking_Sockets",
+    "Storage_Streams",
+]
+
+[profile.release]
+opt-level = 2
