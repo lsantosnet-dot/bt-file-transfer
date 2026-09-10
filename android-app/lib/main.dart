@@ -138,7 +138,9 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(title: const Text('BT File Transfer')),
       body: SafeArea(
-        child: Padding(
+        // Rolável porque o texto de status cresce bastante quando exibe uma
+        // mensagem de erro, estourando a altura da tela em aparelhos menores.
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
