@@ -30,26 +30,27 @@ abrir o app.
 
 ### JDK necessário para o build Android (Gradle)
 
-Este projeto usa Gradle 8.3 / AGP 8.1.0, versões exigidas pela
-dependência `flutter_bluetooth_serial` (não recebe atualizações há
-anos e não funciona em Gradle 9+/AGP 9+ — quebra ao resolver `jcenter()`,
-removido do Gradle). Esse Gradle/AGP só rodam em **JDK até a versão
-20**.
+Este projeto usa **Gradle 8.13 / AGP 8.13.0** — a última versão da
+série 8.x, escolhida deliberadamente para ficar abaixo do Gradle 9.0
+(que removeu de vez o método `jcenter()`, ainda usado pelo
+`build.gradle` interno da dependência `flutter_bluetooth_serial`,
+abandonada há anos). Essa combinação exige **JDK 17** (não roda em
+JDK 20 ou anterior nem foi validada em JDK 21+).
 
-Se o seu `flutter doctor -v` mostrar uma "Java version" 21 ou mais
-recente (comum em instalações novas do Android Studio, que já vêm com
-JDK 25 embutido), o build falha com
-`Unsupported class file major version ...`. Corrija apontando o
-Flutter para um JDK 17 ou 21 dedicado, sem mudar o JDK do Android
-Studio:
+Se o seu `flutter doctor -v` mostrar uma "Java version" diferente de
+17 (comum em instalações novas do Android Studio, que já vêm com JDK
+25 embutido), o build falha com `Unsupported class file major
+version ...` ou erros de resolução de plugin. Corrija apontando o
+Flutter para um JDK 17 dedicado, sem mudar o JDK do Android Studio:
 
 ```bash
-flutter config --jdk-dir="<caminho-do-jdk-17-ou-21>"
+flutter config --jdk-dir="<caminho-do-jdk-17>"
 ```
 
-(ex.: instale o [Temurin 17](https://adoptium.net) e use o caminho de
-instalação dele). Depois rode `flutter doctor -v` de novo para
-confirmar a mudança.
+(ex.: instale o [Temurin 17](https://adoptium.net), ou aponte para um
+JDK 17 que já exista na máquina — o Android Studio/IntelliJ costuma
+manter um em `%USERPROFILE%\.jdks\`). Depois rode `flutter doctor -v`
+de novo para confirmar a mudança.
 
 ## Testes e análise estática
 
