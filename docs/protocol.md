@@ -14,18 +14,31 @@ Qualquer mudança de formato precisa ser replicada nos dois arquivos.
 ## UUID do serviço RFCOMM
 
 ```
-818711c5-3946-4523-b54b-20ac27970afe
+00001101-0000-1000-8000-00805F9B34FB
 ```
 
-Esse UUID é fixo e hardcoded em ambos os lados:
+Este é o UUID padrão do **Serial Port Profile (SPP)**, e não um UUID
+próprio deste projeto. O `windows-server` publica o serviço RFCOMM com
+ele (constante `SERVICE_UUID` em `windows-server/src/server.rs`).
 
-- `windows-server/src/server.rs` (constante `SERVICE_UUID`)
-- `android-app/lib/file_transfer_service.dart` / documentado aqui para uso
-  na descoberta do serviço SPP pelo endereço MAC do dispositivo pareado.
+**Não troque por um UUID customizado.** O lado Android usa o plugin
+`flutter_bluetooth_serial_plus`, cujo código Java chama
+`createRfcommSocketToServiceRecord` com esse UUID fixo:
 
-Se você for gerar um UUID próprio para o seu fork, gere um novo UUID v4
-(`uuidgen` ou `python3 -c "import uuid; print(uuid.uuid4())"`) e atualize
-os dois lados e este documento.
+```java
+protected static final UUID DEFAULT_UUID =
+    UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+```
+
+e não expõe nenhuma forma de passar outro UUID pelo Dart
+(`BluetoothConnection.toAddress(address)` recebe apenas o endereço MAC).
+Se o servidor publicar um UUID diferente, o SDP do celular não encontra
+serviço nenhum e a conexão fica pendurada em `SocketState: INIT` sem
+nunca completar nem falhar de forma óbvia.
+
+Consequência prática: como o serviço é anunciado como um SPP genérico,
+quem garante que os dois lados falam o mesmo protocolo é o handshake
+`HELLO` (que carrega a versão do protocolo), não o UUID.
 
 ## Formato binário do frame
 
