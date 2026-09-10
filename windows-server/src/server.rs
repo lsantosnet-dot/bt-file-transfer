@@ -15,7 +15,8 @@ use windows::core::{HSTRING, GUID};
 use windows::Devices::Bluetooth::Rfcomm::{RfcommServiceId, RfcommServiceProvider};
 use windows::Foundation::TypedEventHandler;
 use windows::Networking::Sockets::{
-    StreamSocket, StreamSocketListener, StreamSocketListenerConnectionReceivedEventArgs,
+    SocketProtectionLevel, StreamSocket, StreamSocketListener,
+    StreamSocketListenerConnectionReceivedEventArgs,
 };
 use windows::Storage::Streams::{DataReader, DataWriter, InputStreamOptions};
 
@@ -75,11 +76,22 @@ pub fn run() -> windows::core::Result<()> {
     );
     listener.ConnectionReceived(&handler)?;
 
-    // Começa a escutar na porta RFCOMM alocada dinamicamente pelo SO,
-    // usando o nível de proteção padrão (a criptografia/autenticação já
-    // foi negociada no pareamento feito previamente pelo usuário via
-    // configurações do Windows).
-    listener.BindServiceNameAsync(&service_id.AsString()?)?.get()?;
+    // Começa a escutar na porta RFCOMM alocada dinamicamente pelo SO.
+    //
+    // O nível de proteção precisa ser explícito: o Android abre o socket
+    // com `createRfcommSocketToServiceRecord`, que exige um canal
+    // *criptografado*. Se o listener ficar no padrão (sem criptografia),
+    // o RFCOMM rejeita a conexão e o celular recebe um
+    // "read failed, socket might closed or timeout" dentro de connect().
+    //
+    // Em WinRT esse overload tem nome próprio (não é o mesmo
+    // `BindServiceNameAsync` com um argumento a mais).
+    listener
+        .BindServiceNameWithProtectionLevelAsync(
+            &service_id.AsString()?,
+            SocketProtectionLevel::BluetoothEncryptionAllowNullAuthentication,
+        )?
+        .get()?;
 
     provider.StartAdvertising(&listener)?;
 
