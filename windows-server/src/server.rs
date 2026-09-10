@@ -21,10 +21,16 @@ use windows::Storage::Streams::{DataReader, DataWriter, InputStreamOptions};
 
 use crate::protocol::{self, NackReason, Packet, PacketType, CRC_LEN, HEADER_LEN};
 
-/// UUID fixo do serviço RFCOMM. Precisa ser idêntico ao valor
-/// hardcoded em `android-app/lib/file_transfer_service.dart`. Veja
-/// `docs/protocol.md` para o valor documentado e instruções de pareamento.
-pub const SERVICE_UUID: &str = "818711c5-3946-4523-b54b-20ac27970afe";
+/// UUID do serviço RFCOMM: o UUID padrão do Serial Port Profile (SPP),
+/// `00001101-0000-1000-8000-00805F9B34FB`.
+///
+/// Ele NÃO pode ser trocado por um UUID próprio: o plugin Android
+/// (`flutter_bluetooth_serial_plus`) chama
+/// `createRfcommSocketToServiceRecord` com esse UUID fixo no código Java
+/// e não expõe nenhuma forma de passar outro pelo Dart. Publicar aqui um
+/// UUID diferente faz o SDP do celular não encontrar serviço nenhum, e a
+/// conexão fica pendurada sem nunca completar.
+pub const SERVICE_UUID: &str = "00001101-0000-1000-8000-00805F9B34FB";
 
 /// Nome amigável anunciado no SDP record do serviço.
 const SERVICE_DISPLAY_NAME: &str = "BT File Transfer";
@@ -78,7 +84,7 @@ pub fn run() -> windows::core::Result<()> {
     provider.StartAdvertising(&listener)?;
 
     println!("bt-file-transfer: servidor RFCOMM ativo.");
-    println!("  UUID do servico: {SERVICE_UUID}");
+    println!("  UUID do servico: {SERVICE_UUID} (Serial Port Profile)");
     println!("  Nome anunciado : {SERVICE_DISPLAY_NAME}");
     println!("  Pasta destino  : {}", download_dir.display());
     println!("Aguardando conexoes do app Android (pareie o dispositivo antes de enviar)...");

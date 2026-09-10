@@ -64,8 +64,9 @@ cargo run
 
 O servidor:
 
-1. Publica um serviço RFCOMM com UUID fixo `818711c5-3946-4523-b54b-20ac27970afe`
-   (veja `docs/protocol.md`).
+1. Publica um serviço RFCOMM com o UUID padrão do Serial Port Profile,
+   `00001101-0000-1000-8000-00805F9B34FB` (veja `docs/protocol.md` para
+   o porquê de não ser um UUID próprio).
 2. Aguarda conexões, faz o handshake `HELLO`, recebe o pacote `META`
    (nome, tamanho, SHA-256) e o arquivo em chunks de 4KB, confirmando
    cada um com `ACK`.
