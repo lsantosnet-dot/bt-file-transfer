@@ -30,8 +30,8 @@ abrir o app.
 
 ### JDK necessário para o build Android (Gradle)
 
-Este projeto usa **Gradle 8.13 / AGP 8.13.0** — a última versão da
-série 8.x, escolhida deliberadamente para ficar abaixo do Gradle 9.0
+Este projeto usa **Gradle 8.14.2 / AGP 8.13.0** — a última série 8.x,
+escolhida deliberadamente para ficar abaixo do Gradle 9.0
 (que removeu de vez o método `jcenter()`, ainda usado pelo
 `build.gradle` interno da dependência `flutter_bluetooth_serial`,
 abandonada há anos). Essa combinação exige **JDK 17** (não roda em

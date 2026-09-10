@@ -9,10 +9,6 @@ rootProject.buildDir = "../build"
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
-subprojects {
-    project.evaluationDependsOn(":app")
-}
-
 // Compatibilidade com plugins Flutter antigos (ex.: flutter_bluetooth_serial,
 // sem atualizacoes desde 2021) que nao declaram "namespace" no proprio
 // build.gradle, exigido a partir da AGP 8. Antes a AGP inferia o namespace
@@ -20,6 +16,10 @@ subprojects {
 // mais, entao aqui reaproveitamos o "group" que esses plugins antigos ja
 // declaravam (era o padrao do template de plugin Flutter da epoca, e tem
 // o mesmo valor do "package" do manifesto).
+//
+// Precisa vir ANTES do evaluationDependsOn(":app") abaixo: aquela linha
+// forca a avaliacao imediata do :app, e registrar um afterEvaluate em um
+// projeto ja avaliado e um erro no Gradle.
 subprojects {
     afterEvaluate { project ->
         if (project.hasProperty("android")) {
@@ -29,6 +29,10 @@ subprojects {
             }
         }
     }
+}
+
+subprojects {
+    project.evaluationDependsOn(":app")
 }
 
 tasks.register("clean", Delete) {
