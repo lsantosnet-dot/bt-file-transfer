@@ -9,7 +9,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:flutter_bluetooth_serial_plus/flutter_bluetooth_serial_plus.dart';
 
 import 'protocol.dart';
 
@@ -130,13 +130,8 @@ class FileTransferService {
   /// pelo usuário — este app não realiza pareamento.
   Future<void> connect(BluetoothDevice device) async {
     final connection = await BluetoothConnection.toAddress(device.address);
-    final input = connection.input;
-    if (input == null) {
-      await connection.close();
-      throw FileTransferException('Nao foi possivel abrir o stream de entrada da conexao Bluetooth.');
-    }
     _connection = connection;
-    _reader = _FrameReader(input);
+    _reader = _FrameReader(connection.input);
   }
 
   Future<void> disconnect() async {

@@ -28,14 +28,21 @@ Pré-requisito: o dispositivo Android precisa já estar **pareado** com o
 Windows pelas configurações de Bluetooth do próprio Android antes de
 abrir o app.
 
+### Sobre a dependência de Bluetooth
+
+O app usa **`flutter_bluetooth_serial_plus`**, um fork mantido do
+`flutter_bluetooth_serial` com exatamente a mesma API Dart. O pacote
+original parou de receber atualizações em 2021 e não compila com a
+AGP 8: ele chama `jcenter()` (removido do Gradle 9), não declara
+`namespace`, fixa `compileSdkVersion 30` (as libs AndroidX que ele
+puxa exigem 34+) e ainda define `package` no `AndroidManifest.xml`
+(a AGP 8 rejeita) — e nada disso dá para corrigir de fora, já que
+esses arquivos vivem dentro do pacote baixado no pub cache.
+
 ### JDK necessário para o build Android (Gradle)
 
-Este projeto usa **Gradle 8.14.2 / AGP 8.13.0** — a última série 8.x,
-escolhida deliberadamente para ficar abaixo do Gradle 9.0
-(que removeu de vez o método `jcenter()`, ainda usado pelo
-`build.gradle` interno da dependência `flutter_bluetooth_serial`,
-abandonada há anos). Essa combinação exige **JDK 17** (não roda em
-JDK 20 ou anterior nem foi validada em JDK 21+).
+Este projeto usa **Gradle 8.14.2 / AGP 8.13.0**, combinação que exige
+**JDK 17**.
 
 Se o seu `flutter doctor -v` mostrar uma "Java version" diferente de
 17 (comum em instalações novas do Android Studio, que já vêm com JDK
