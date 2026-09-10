@@ -1,0 +1,5 @@
+# Cruft de sistema operacional / editores
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
