@@ -13,6 +13,24 @@ subprojects {
     project.evaluationDependsOn(":app")
 }
 
+// Compatibilidade com plugins Flutter antigos (ex.: flutter_bluetooth_serial,
+// sem atualizacoes desde 2021) que nao declaram "namespace" no proprio
+// build.gradle, exigido a partir da AGP 8. Antes a AGP inferia o namespace
+// do atributo "package" do AndroidManifest.xml; esse fallback nao existe
+// mais, entao aqui reaproveitamos o "group" que esses plugins antigos ja
+// declaravam (era o padrao do template de plugin Flutter da epoca, e tem
+// o mesmo valor do "package" do manifesto).
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty("android")) {
+            def androidExt = project.extensions.getByName("android")
+            if (androidExt.namespace == null) {
+                androidExt.namespace = project.group
+            }
+        }
+    }
+}
+
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
