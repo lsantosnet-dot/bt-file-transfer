@@ -15,14 +15,11 @@ use windows::core::{HSTRING, GUID};
 use windows::Devices::Bluetooth::Rfcomm::{RfcommServiceId, RfcommServiceProvider};
 use windows::Foundation::TypedEventHandler;
 use windows::Networking::Sockets::{
-    SocketProtectionLevel, StreamSocket, StreamSocketListener,
-    StreamSocketListenerConnectionReceivedEventArgs,
+    StreamSocket, StreamSocketListener, StreamSocketListenerConnectionReceivedEventArgs,
 };
 use windows::Storage::Streams::{DataReader, DataWriter, InputStreamOptions};
 
-use crate::protocol::{
-    self, MetaPayload, NackReason, Packet, PacketType, CHUNK_SIZE, CRC_LEN, HEADER_LEN,
-};
+use crate::protocol::{self, NackReason, Packet, PacketType, CRC_LEN, HEADER_LEN};
 
 /// UUID fixo do serviço RFCOMM. Precisa ser idêntico ao valor
 /// hardcoded em `android-app/lib/file_transfer_service.dart`. Veja
@@ -61,7 +58,7 @@ pub fn run() -> windows::core::Result<()> {
     let (tx, rx) = mpsc::channel::<StreamSocket>();
 
     let handler = TypedEventHandler::new(
-        move |_listener, args: windows::core::Ref<'_, StreamSocketListenerConnectionReceivedEventArgs>| {
+        move |_listener, args: &Option<StreamSocketListenerConnectionReceivedEventArgs>| {
             if let Some(args) = args.as_ref() {
                 if let Ok(socket) = args.Socket() {
                     let _ = tx.send(socket);
@@ -72,14 +69,11 @@ pub fn run() -> windows::core::Result<()> {
     );
     listener.ConnectionReceived(&handler)?;
 
-    // Anuncia o serviço com o nome de exibição via SDP raw attribute e
-    // começa a escutar na porta RFCOMM alocada dinamicamente pelo SO.
-    listener
-        .BindServiceNameAsync(
-            &service_id.AsString()?,
-            SocketProtectionLevel::BluetoothEncryptionAllowNullAuthentication,
-        )?
-        .get()?;
+    // Começa a escutar na porta RFCOMM alocada dinamicamente pelo SO,
+    // usando o nível de proteção padrão (a criptografia/autenticação já
+    // foi negociada no pareamento feito previamente pelo usuário via
+    // configurações do Windows).
+    listener.BindServiceNameAsync(&service_id.AsString()?)?.get()?;
 
     provider.StartAdvertising(&listener)?;
 
